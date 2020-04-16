@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CourseProjectMVC.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace CourseProjectMVC
 {
-    public class MyDbContext : DbContext
+    public class MyDbContext : IdentityDbContext<Customer>
     {
         public MyDbContext(DbContextOptions options) : base(options)
         {

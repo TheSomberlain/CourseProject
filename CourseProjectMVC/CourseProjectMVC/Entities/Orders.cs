@@ -24,8 +24,8 @@ namespace CourseProjectMVC.Entities
         [ForeignKey("StoreId")]
         public int StoreId { get; set; }
         public Store Store { get; set; }
-        [ForeignKey("CustomerId")]
-        public int CustomerId { get; set; }
+        [ForeignKey("Id")]
+        public string CustomerId { get; set; }
         public Customer Customer { get; set; }
         public IEnumerable<OrderProduct> OrderProducts { get; set; }
 

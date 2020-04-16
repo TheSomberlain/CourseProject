@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CourseProjectMVC.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +39,23 @@ namespace CourseProjectMVC
                     options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 }
             );
+
+            services.AddIdentity<Customer, IdentityRole>(config =>
+            {
+                config.Password.RequireLowercase = true;
+                config.Password.RequireUppercase = false;
+                config.Password.RequireNonAlphanumeric = false;
+                config.Password.RequireDigit = false;
+                config.Password.RequiredLength = 5;
+            })
+                .AddEntityFrameworkStores<MyDbContext>()
+                .AddDefaultTokenProviders();
+            services.ConfigureApplicationCookie(conf =>
+            {
+                conf.Cookie.Name = "Identity.Cookie";
+                conf.LoginPath = "/api/auth/login";
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +68,7 @@ namespace CourseProjectMVC
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
