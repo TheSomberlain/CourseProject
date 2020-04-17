@@ -13,11 +13,11 @@ namespace CourseProjectMVC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    public class StaffController : ControllerBase
     {
         private readonly MyDbContext _db;
 
-        public OrderController(MyDbContext context)
+        public StaffController(MyDbContext context)
         {
             _db = context;
         }
@@ -27,14 +27,8 @@ namespace CourseProjectMVC.Controllers
         {
             try
             {
-                var Order = await _db.Orders.AsNoTracking()
-                    .Include(x => x.Customer)
-                    .Select(x => new
-                        {x.OrderId, x.OrderDate, x.OrderStatus, x.RequiredDate, x.ShippedDate, x.Store,
-                            Customer = new {x.Customer.FistName,x.Customer.LastName}})
-                    .ToArrayAsync();
-                
-                return Ok(Order);
+                var Staff = await _db.Staff.AsNoTracking().OrderBy(x => x.StaffId).ToArrayAsync();
+                return Ok(Staff);
             }
             catch (Exception e)
             {
@@ -49,16 +43,9 @@ namespace CourseProjectMVC.Controllers
         {
             try
             {
-                var Order = await _db.Orders.AsNoTracking()
-                    .Include(x => x.Customer)
-                    .Select(x => new
-                    {
-                        x.OrderId, x.OrderDate, x.OrderStatus, x.RequiredDate, x.ShippedDate, x.Store,
-                        Customer = new {x.Customer.FistName, x.Customer.LastName}
-                    })
-                    .FirstAsync(z => z.OrderId == id);
-                if (Order == null) return NotFound();
-                return Ok(Order);
+                var Staff = await _db.Staff.FindAsync(id);
+                if (Staff == null) return NotFound();
+                return Ok(Staff);
             }
             catch (Exception e)
             {
@@ -69,17 +56,15 @@ namespace CourseProjectMVC.Controllers
 
         // POST: api/Store
         [HttpPost("post")]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> Post([FromBody] StaffModel model)
         {
             try
             {
-                var Order = new Order();
-                Order.StoreId = 1;
-                Order.OrderStatus = OrderStatus.Rendering;
-                Order.OrderDate = DateTime.Now;
-                await _db.AddAsync(Order);
+                var Staff = new Staff();
+                Reflection.UpdateEntity(Staff, model);
+                await _db.AddAsync(Staff);
                 await _db.SaveChangesAsync();
-                return StatusCode(201, Order);
+                return StatusCode(201, Staff);
             }
             catch (Exception e)
             {
@@ -90,16 +75,16 @@ namespace CourseProjectMVC.Controllers
 
         // PUT: api/Store/5
         [HttpPatch("patch/{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] OrderModel model)
+        public async Task<IActionResult> Put(int id, [FromBody] StaffModel model)
         {
             try
             {
-                var Order = await _db.Orders.FindAsync(id);
-                if (Order == null) return BadRequest();
-                Reflection.UpdateEntity(Order, model);
-                _db.Orders.Update(Order);
+                var Staff = await _db.Staff.FindAsync(id);
+                if (Staff == null) return BadRequest();
+                Reflection.UpdateEntity(Staff, model);
+                _db.Staff.Update(Staff);
                 await _db.SaveChangesAsync();
-                return Ok(Order);
+                return Ok(Staff);
             }
             catch (Exception e)
             {
@@ -114,9 +99,9 @@ namespace CourseProjectMVC.Controllers
         {
             try
             {
-                var Order = await _db.Orders.FindAsync(id);
-                if (Order == null) return BadRequest();
-                _db.Orders.Remove(Order);
+                var Staff = await _db.Staff.FindAsync(id);
+                if (Staff == null) return BadRequest();
+                _db.Staff.Remove(Staff);
                 await _db.SaveChangesAsync();
                 return Ok();
             }

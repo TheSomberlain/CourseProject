@@ -13,11 +13,11 @@ namespace CourseProjectMVC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    public class ProductController : ControllerBase
     {
         private readonly MyDbContext _db;
 
-        public OrderController(MyDbContext context)
+        public ProductController(MyDbContext context)
         {
             _db = context;
         }
@@ -27,14 +27,8 @@ namespace CourseProjectMVC.Controllers
         {
             try
             {
-                var Order = await _db.Orders.AsNoTracking()
-                    .Include(x => x.Customer)
-                    .Select(x => new
-                        {x.OrderId, x.OrderDate, x.OrderStatus, x.RequiredDate, x.ShippedDate, x.Store,
-                            Customer = new {x.Customer.FistName,x.Customer.LastName}})
-                    .ToArrayAsync();
-                
-                return Ok(Order);
+                var product = await _db.Product.AsNoTracking().OrderBy(x => x.ProductId).ToArrayAsync();
+                return Ok(product);
             }
             catch (Exception e)
             {
@@ -49,16 +43,9 @@ namespace CourseProjectMVC.Controllers
         {
             try
             {
-                var Order = await _db.Orders.AsNoTracking()
-                    .Include(x => x.Customer)
-                    .Select(x => new
-                    {
-                        x.OrderId, x.OrderDate, x.OrderStatus, x.RequiredDate, x.ShippedDate, x.Store,
-                        Customer = new {x.Customer.FistName, x.Customer.LastName}
-                    })
-                    .FirstAsync(z => z.OrderId == id);
-                if (Order == null) return NotFound();
-                return Ok(Order);
+                var product = await _db.Product.FindAsync(id);
+                if (product == null) return NotFound();
+                return Ok(product);
             }
             catch (Exception e)
             {
@@ -69,17 +56,15 @@ namespace CourseProjectMVC.Controllers
 
         // POST: api/Store
         [HttpPost("post")]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> Post([FromBody] ProductModel model)
         {
             try
             {
-                var Order = new Order();
-                Order.StoreId = 1;
-                Order.OrderStatus = OrderStatus.Rendering;
-                Order.OrderDate = DateTime.Now;
-                await _db.AddAsync(Order);
+                var product = new Product();
+                Reflection.UpdateEntity(product, model);
+                await _db.AddAsync(product);
                 await _db.SaveChangesAsync();
-                return StatusCode(201, Order);
+                return StatusCode(201, product);
             }
             catch (Exception e)
             {
@@ -90,16 +75,16 @@ namespace CourseProjectMVC.Controllers
 
         // PUT: api/Store/5
         [HttpPatch("patch/{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] OrderModel model)
+        public async Task<IActionResult> Put(int id, [FromBody] ProductModel model)
         {
             try
             {
-                var Order = await _db.Orders.FindAsync(id);
-                if (Order == null) return BadRequest();
-                Reflection.UpdateEntity(Order, model);
-                _db.Orders.Update(Order);
+                var product = await _db.Product.FindAsync(id);
+                if (product == null) return BadRequest();
+                Reflection.UpdateEntity(product, model);
+                _db.Product.Update(product);
                 await _db.SaveChangesAsync();
-                return Ok(Order);
+                return Ok(product);
             }
             catch (Exception e)
             {
@@ -114,9 +99,9 @@ namespace CourseProjectMVC.Controllers
         {
             try
             {
-                var Order = await _db.Orders.FindAsync(id);
-                if (Order == null) return BadRequest();
-                _db.Orders.Remove(Order);
+                var product = await _db.Product.FindAsync(id);
+                if (product == null) return BadRequest();
+                _db.Product.Remove(product);
                 await _db.SaveChangesAsync();
                 return Ok();
             }

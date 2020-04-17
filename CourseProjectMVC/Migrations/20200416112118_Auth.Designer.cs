@@ -3,79 +3,23 @@ using System;
 using CourseProjectMVC;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CourseProjectMVC.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200416112118_Auth")]
+    partial class Auth
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            modelBuilder.Entity("CourseProjectMVC.Entities.Admin", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("text");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Admins");
-                });
 
             modelBuilder.Entity("CourseProjectMVC.Entities.Customer", b =>
                 {
@@ -286,9 +230,6 @@ namespace CourseProjectMVC.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("AdminId")
-                        .HasColumnType("text");
-
                     b.Property<string>("Building")
                         .HasColumnType("text");
 
@@ -311,9 +252,6 @@ namespace CourseProjectMVC.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("StoreId");
-
-                    b.HasIndex("AdminId")
-                        .IsUnique();
 
                     b.HasIndex("StockId")
                         .IsUnique();
@@ -490,10 +428,6 @@ namespace CourseProjectMVC.Migrations
 
             modelBuilder.Entity("CourseProjectMVC.Entities.Store", b =>
                 {
-                    b.HasOne("CourseProjectMVC.Entities.Admin", "Admin")
-                        .WithOne("Store")
-                        .HasForeignKey("CourseProjectMVC.Entities.Store", "AdminId");
-
                     b.HasOne("CourseProjectMVC.Entities.Stock", "Stock")
                         .WithOne("Store")
                         .HasForeignKey("CourseProjectMVC.Entities.Store", "StockId")
