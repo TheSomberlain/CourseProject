@@ -7,17 +7,31 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CourseProjectMVC.Controllers
 {
-    /*[ApiController]
+    [ApiController]
     [Route("api/role")]
     public class RoleController : ControllerBase
     {
-        private readonly RoleManager<IdentityUser> _roleManager;
-        public RoleController(RoleManager<IdentityUser> rm)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public RoleController(RoleManager<IdentityRole> rm)
         {
             _roleManager = rm;
         }
 
-        [HttpPost("post")]
-        pri
-    }*/
+        [HttpPost("post/{name}")]
+        public async Task<IActionResult> CreateRole(string name)
+        {
+            bool x = await _roleManager.RoleExistsAsync("name");
+            if (!x)
+            {
+                var role = new IdentityRole
+                {
+                    Name = name
+                };
+                await _roleManager.CreateAsync(role);
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+    }
 }

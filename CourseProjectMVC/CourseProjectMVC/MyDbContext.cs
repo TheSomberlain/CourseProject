@@ -65,7 +65,7 @@ namespace CourseProjectMVC
                 b.Property(s => s.Products)
                     .HasConversion(
                         d => JsonConvert.SerializeObject(d, Formatting.None),
-                        s => JsonConvert.DeserializeObject<Dictionary<int, int>>(s)
+                        s => JsonConvert.DeserializeObject<Dictionary<string, int>>(s)
                         )
                 );
 

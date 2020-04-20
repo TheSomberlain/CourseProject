@@ -53,30 +53,6 @@ namespace CourseProjectMVC.Controllers
                 return StatusCode(409);
             }
         }
-
-        [HttpPatch("patch/{id}")]
-        public async Task<IActionResult> Put(int id, Product product)
-        {
-            /*try
-            {
-                var stock = await _db.Stock.FindAsync(id);
-                if (stock == null) return BadRequest();
-                if (stock.Products.ContainsKey(product))
-                {
-                    stock.Products[product]++;
-                }
-                else
-                {
-                    stock.Products.Add(product, 1);
-                }
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return StatusCode(409);
-            }*/
-            return BadRequest();
-        }
+        
     }
 }

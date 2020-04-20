@@ -15,7 +15,7 @@ namespace CourseProjectMVC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class StoreController : ControllerBase
     {
         private readonly MyDbContext _db;
@@ -79,7 +79,7 @@ namespace CourseProjectMVC.Controllers
                 {
                     Store = store
                 };
-                stock.Products = new Dictionary<int, int>();
+                stock.Products = new Dictionary<string, int>();
                 await _db.AddAsync(stock);
                 await _db.SaveChangesAsync();
                 return StatusCode(201, store);
@@ -133,21 +133,20 @@ namespace CourseProjectMVC.Controllers
         }
 
         [HttpPatch("addProduct/{id}")]
-        public async Task<IActionResult> AddProduct(int id)
+        public async Task<IActionResult> AddProduct(int id, [FromForm] int productId )
         {
             try
             {
-                var product = await _db.Product.FindAsync(1);
-
+                var product = await _db.Product.FindAsync(productId);
                 var stock = await _db.Stock.FindAsync(id);
-                if (stock == null) return BadRequest();
-                if (stock.Products.ContainsKey(product.ProductId))
+                if (stock == null || product == null) return BadRequest();
+                if (stock.Products.ContainsKey(product.Name))
                 {
-                    stock.Products[product.ProductId]++;
+                    stock.Products[product.Name]++;
                 }
                 else
                 {
-                    stock.Products.Add(product.ProductId, 1);
+                    stock.Products.Add(product.Name, productId);
                 }
 
                 _db.Stock.Update(stock);

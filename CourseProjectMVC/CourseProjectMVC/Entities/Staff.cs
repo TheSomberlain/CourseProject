@@ -17,7 +17,7 @@ namespace CourseProjectMVC.Entities
         public bool IsActive { get; set; }
         [ForeignKey("StoreId")]
         [JsonIgnore]
-        public int StoreId { get; set; }
+        public int? StoreId { get; set; }
         public Store Store { get; set; }
     }
 }

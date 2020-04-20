@@ -73,10 +73,11 @@ namespace CourseProjectMVC.Controllers
         {
             try
             {
-                var Order = new Order();
-                Order.StoreId = 1;
-                Order.OrderStatus = OrderStatus.Rendering;
-                Order.OrderDate = DateTime.Now;
+                var Order = new Order
+                {
+                    OrderStatus = OrderStatus.Rendering,
+                    OrderDate = DateTime.Now
+                };
                 await _db.AddAsync(Order);
                 await _db.SaveChangesAsync();
                 return StatusCode(201, Order);

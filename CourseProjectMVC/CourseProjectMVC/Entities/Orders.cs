@@ -23,7 +23,7 @@ namespace CourseProjectMVC.Entities
         public DateTime RequiredDate { get; set; }
         public DateTime ShippedDate { get; set; }
         [ForeignKey("StoreId")]
-        public int StoreId { get; set; }
+        public int? StoreId { get; set; }
         public Store Store { get; set; }
         [ForeignKey("Id")]
         [JsonIgnore]

@@ -11,7 +11,7 @@ namespace CourseProjectMVC.Entities
     {
         public int StockId { get; set; }
         public Store Store { get; set; }
-        public Dictionary<int, int> Products { get; set; }
+        public Dictionary<string, int> Products { get; set; }
 
     }
 }

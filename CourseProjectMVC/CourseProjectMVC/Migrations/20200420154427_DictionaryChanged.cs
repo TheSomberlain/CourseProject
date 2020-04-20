@@ -2,7 +2,7 @@
 
 namespace CourseProjectMVC.Migrations
 {
-    public partial class change : Migration
+    public partial class DictionaryChanged : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -93,7 +93,7 @@ namespace CourseProjectMVC.Migrations
                     OrderDate = table.Column<DateTime>(nullable: false),
                     RequiredDate = table.Column<DateTime>(nullable: false),
                     ShippedDate = table.Column<DateTime>(nullable: false),
-                    StoreId = table.Column<int>(nullable: false),
+                    StoreId = table.Column<int>(nullable: true),
                     CustomerId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -124,7 +124,7 @@ namespace CourseProjectMVC.Migrations
                     Email = table.Column<string>(nullable: true),
                     Phone = table.Column<string>(nullable: true),
                     IsActive = table.Column<bool>(nullable: false),
-                    StoreId = table.Column<int>(nullable: false)
+                    StoreId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {

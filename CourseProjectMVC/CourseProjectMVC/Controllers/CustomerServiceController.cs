@@ -31,16 +31,14 @@ namespace _1stWebApp.Controllers
 
         [Authorize]
         [HttpPost("newOrder")]
-        public async Task<IActionResult> CreateOrder(string customerId)
+        public async Task<IActionResult> CreateOrder()
         {
             try
             {
                 string name = HttpContext.User.Identity.Name;
                 var user = await _db.Customer.Where(x => x.UserName == name).ToArrayAsync();
-                Console.WriteLine("name:" + name);
                 var Order = new Order
                 {
-                    StoreId = 1,
                     OrderStatus = OrderStatus.Rendering,
                     OrderDate = DateTime.Now,
                     CustomerId = user[0].Id
