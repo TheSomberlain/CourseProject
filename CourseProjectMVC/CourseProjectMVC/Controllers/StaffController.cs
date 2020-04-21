@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using _1stWebApp.utils.reflect;
 using CourseProjectMVC.Entities;
 using CourseProjectMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ namespace CourseProjectMVC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class StaffController : ControllerBase
     {
         private readonly MyDbContext _db;

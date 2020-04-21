@@ -28,7 +28,7 @@ namespace CourseProjectMVC.Entities
         [ForeignKey("Id")]
         [JsonIgnore]
         public string CustomerId { get; set; }
-        public Customer Customer { get; set; }
+        public User Customer { get; set; }
         [JsonIgnore]
         public IEnumerable<OrderProduct> OrderProducts { get; set; }
 

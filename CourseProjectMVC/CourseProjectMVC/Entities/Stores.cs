@@ -24,7 +24,7 @@ namespace CourseProjectMVC.Entities
         public Stock Stock { get; set; } 
         [ForeignKey("AdminId")]
         public string AdminId { get; set; }
-        public Admin Admin { get; set; }
+        public User Admin { get; set; }
         public IEnumerable<Staff> Staff { get; set; }
         public IEnumerable<Order> Orders { get; set; }
     }

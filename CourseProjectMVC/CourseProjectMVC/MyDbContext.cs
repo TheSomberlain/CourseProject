@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace CourseProjectMVC
 {
-    public class MyDbContext : IdentityDbContext<Customer>
+    public class MyDbContext : IdentityDbContext<User>
     {
         public MyDbContext(DbContextOptions options) : base(options)
         {
@@ -19,12 +19,11 @@ namespace CourseProjectMVC
         public DbSet<Store> Stores { get; set; }
         public DbSet<Staff> Staff { get; set; }
         public DbSet<Stock> Stock { get; set; }
-        public DbSet<Customer> Customer { get; set; }
+        public DbSet<User> User { get; set; }
         public DbSet<OrderProduct> OrderProduct { get; set; }
         public DbSet<Product> Product { get; set; }
         public DbSet<Order> Orders { get; set; }
 
-        public DbSet<Admin> Admins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -41,7 +40,7 @@ namespace CourseProjectMVC
                 .HasForeignKey<Store>(z => z.StockId);
 
             builder.Entity<Order>()
-                .HasOne<Customer>(ord => ord.Customer)
+                .HasOne<User>(ord => ord.Customer)
                 .WithMany(cust => cust.Orders)
                 .HasForeignKey(k => k.CustomerId);
 
@@ -69,7 +68,7 @@ namespace CourseProjectMVC
                         )
                 );
 
-            builder.Entity<Admin>()
+            builder.Entity<User>()
                 .HasOne(x => x.Store)
                 .WithOne(z => z.Admin)
                 .HasForeignKey<Store>(y => y.AdminId);

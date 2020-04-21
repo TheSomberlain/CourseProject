@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CourseProjectMVC.Entities
 {
-    public class Customer : IdentityUser
+    public class User : IdentityUser
     {
         public string FistName { get; set; }
         public string LastName { get; set; }
@@ -17,7 +17,8 @@ namespace CourseProjectMVC.Entities
         public string City { get; set; }
         public string Street { get; set; }
         public string Building { get; set; }
-
+        public bool isActive { get; set; }
+        public Store Store { get; set; }
         public IEnumerable<Order> Orders { get; set; }
     }
 }

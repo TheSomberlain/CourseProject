@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace CourseProjectMVC.Controllers
 {
     [ApiController]
     [Route("api/role")]
+    [Authorize(Roles = "Admin")]
     public class RoleController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;

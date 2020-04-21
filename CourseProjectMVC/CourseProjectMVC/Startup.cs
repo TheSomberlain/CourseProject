@@ -43,7 +43,7 @@ namespace CourseProjectMVC
 
             services.AddRazorPages();
 
-            services.AddIdentity<Customer, IdentityRole>(config =>
+            services.AddIdentity<User, IdentityRole>(config =>
             {
                 config.Password.RequireLowercase = true;
                 config.Password.RequireUppercase = false;
@@ -53,6 +53,10 @@ namespace CourseProjectMVC
             })
                 .AddEntityFrameworkStores<MyDbContext>()
                 .AddDefaultTokenProviders();
+
+
+          //  services.AddSecondIdentity<Admin,IdentityRole>();
+
             services.ConfigureApplicationCookie(conf =>
             {
                 conf.Cookie.Name = "Identity.Cookie";

@@ -17,13 +17,13 @@ namespace _1stWebApp.Controllers
 {
     
     [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    [Route("api/user")]
+    public class CustomerAuthController : ControllerBase
     {
-        private readonly UserManager<Customer> _userManager;
-        private readonly SignInManager<Customer> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly MyDbContext _db;
-        public AuthController(UserManager<Customer> um, SignInManager<Customer> signInManager, MyDbContext context)
+        public CustomerAuthController(UserManager<User> um, SignInManager<User> signInManager, MyDbContext context)
         {
             _userManager = um;
             _signInManager = signInManager;
@@ -35,7 +35,7 @@ namespace _1stWebApp.Controllers
             [FromForm] string lastName,
             [FromForm] string password)
         {
-            var user = new Customer() { UserName = name, LastName = lastName };
+            var user = new User() { UserName = name, LastName = lastName };
             var result = await _userManager.CreateAsync(user, password);
             if (result.Succeeded)
             {
@@ -60,7 +60,7 @@ namespace _1stWebApp.Controllers
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> logout()
+        public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return Ok();
