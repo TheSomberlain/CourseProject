@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CourseProjectMVC.Entities;
+using CourseProjectMVC.Interfaces;
+using CourseProjectMVC.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -14,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using EasyCaching.Core;
+using EasyCaching.Core.Configurations;
 
 namespace CourseProjectMVC
 {
@@ -54,8 +58,10 @@ namespace CourseProjectMVC
                 .AddEntityFrameworkStores<MyDbContext>()
                 .AddDefaultTokenProviders();
 
-
-          //  services.AddSecondIdentity<Admin,IdentityRole>();
+            services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                options.ValidationInterval = TimeSpan.Zero;
+            });
 
             services.ConfigureApplicationCookie(conf =>
             {
@@ -67,6 +73,20 @@ namespace CourseProjectMVC
             {
                 swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "My API" });
             });
+
+            services.AddEasyCaching(opt =>
+            {
+                opt.UseRedis(conf =>
+                {
+                    conf.DBConfig.Endpoints.Add(new ServerEndPoint("localhost", 6379));
+                    conf.DBConfig.AllowAdmin = true;
+                },
+                  "redis1");
+            });
+
+            services.AddScoped<IRedisService,RedisService>();
+            services.AddScoped<IÑurrencyService, CurrencyService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

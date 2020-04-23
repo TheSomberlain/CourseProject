@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using _1stWebApp.utils.reflect;
 using CourseProjectMVC.Entities;
 using CourseProjectMVC.Models;
+using CourseProjectMVC.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NHibernate.Util;
 
 namespace CourseProjectMVC.Controllers
 {
@@ -18,18 +20,35 @@ namespace CourseProjectMVC.Controllers
     public class ProductController : ControllerBase
     {
         private readonly MyDbContext _db;
-
-        public ProductController(MyDbContext context)
+        private readonly IСurrencyService _сurrencyService;
+        private readonly IRedisService _redisService;
+        public ProductController(MyDbContext context, IСurrencyService s, IRedisService r)
         {
             _db = context;
+            _сurrencyService = s;
+            _redisService = r;
         }
         // GET: api/Store
         [HttpGet("get")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string CountryCode)
         {
             try
             {
-                var product = await _db.Product.AsNoTracking().OrderBy(x => x.ProductId).ToArrayAsync();
+                double ratio = 1;
+                if (CountryCode != null)
+                {
+                   var str= await _redisService.Consume("Cur");
+                   var currenciesString = str.Value;
+                   var currenciesModel = _сurrencyService.ParseCurrenciesToModel(currenciesString);
+                   var nums = currenciesModel.Where(z=> z.cc == CountryCode).Select(x => x.rate);
+                   if (nums.Any()) ratio = nums.First();
+                }
+
+                var product = await _db.Product.OrderBy(x => x.ProductId).ToArrayAsync();
+                for (int i = 0; i < product.Length; i++)
+                {
+                    product[i].Price *= ratio;
+                }
                 return Ok(product);
             }
             catch (Exception e)

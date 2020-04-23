@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CourseProjectMVC.Models
 {
-    public class CustomerModel
+    public class UserModel
     {
         public string FistName { get; set; }
         public string LastName { get; set; }
