@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using _1stWebApp.utils.reflect;
 using CourseProjectMVC.Entities;
+using CourseProjectMVC.Interfaces;
 using CourseProjectMVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,11 +18,11 @@ namespace CourseProjectMVC.Controllers
     [Authorize(Roles = "Admin")]
     public class StaffController : ControllerBase
     {
-        private readonly MyDbContext _db;
+        private readonly IStaffService _staffService;
 
-        public StaffController(MyDbContext context)
+        public StaffController(IStaffService context)
         {
-            _db = context;
+            _staffService = context;
         }
         // GET: api/Store
         [HttpGet("get")]
@@ -29,8 +30,8 @@ namespace CourseProjectMVC.Controllers
         {
             try
             {
-                var Staff = await _db.Staff.AsNoTracking().OrderBy(x => x.StaffId).ToArrayAsync();
-                return Ok(Staff);
+                var staff = await _staffService.GetAll();
+                return Ok(staff);
             }
             catch (Exception e)
             {
@@ -39,15 +40,14 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // GET: api/Store/5
         [HttpGet("get/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
             {
-                var Staff = await _db.Staff.FindAsync(id);
-                if (Staff == null) return NotFound();
-                return Ok(Staff);
+                var staff = await _staffService.GetById(id);
+                if (staff == null) return NotFound();
+                return Ok(staff);
             }
             catch (Exception e)
             {
@@ -56,17 +56,13 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // POST: api/Store
         [HttpPost("post")]
         public async Task<IActionResult> Post([FromBody] StaffModel model)
         {
             try
             {
-                var Staff = new Staff();
-                Reflection.UpdateEntity(Staff, model);
-                await _db.AddAsync(Staff);
-                await _db.SaveChangesAsync();
-                return StatusCode(201, Staff);
+                var staff = await _staffService.CreateStaff(model);
+                return StatusCode(201, staff);
             }
             catch (Exception e)
             {
@@ -75,18 +71,15 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // PUT: api/Store/5
         [HttpPatch("patch/{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] StaffModel model)
         {
             try
             {
-                var Staff = await _db.Staff.FindAsync(id);
-                if (Staff == null) return BadRequest();
-                Reflection.UpdateEntity(Staff, model);
-                _db.Staff.Update(Staff);
-                await _db.SaveChangesAsync();
-                return Ok(Staff);
+                var staff = await _staffService.PatchStaff(id, model);
+                if (staff == null)
+                    return BadRequest();
+                return Ok(staff);
             }
             catch (Exception e)
             {
@@ -95,16 +88,14 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var Staff = await _db.Staff.FindAsync(id);
-                if (Staff == null) return BadRequest();
-                _db.Staff.Remove(Staff);
-                await _db.SaveChangesAsync();
+                var res = await _staffService.DeleteStaff(id);
+                if (!res)
+                    return BadRequest();
                 return Ok();
             }
             catch (Exception e)

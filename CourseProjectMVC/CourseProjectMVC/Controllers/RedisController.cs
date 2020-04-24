@@ -19,14 +19,7 @@ namespace CourseProjectMVC.Controllers
         {
             _redisService = s;
         }
-        // GET: api/Redis
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
 
-        // GET: api/Redis/5
         [HttpGet("getByKey/{key}")]
         public async Task<IActionResult> Get(string key)
         {
@@ -42,24 +35,10 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // POST: api/Redis
         [HttpPost]
         public async Task<IActionResult> Post([FromForm]string key, [FromForm] string value)
         {
             await _redisService.Put(key, value);
-            return Ok();
-        }
-
-        // PUT: api/Redis/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("delete/{key}")]
-        public async Task<IActionResult> Delete(string key)
-        {
             return Ok();
         }
     }

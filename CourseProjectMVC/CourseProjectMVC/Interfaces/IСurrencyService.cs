@@ -10,5 +10,6 @@ namespace CourseProjectMVC.Interfaces
     {
         Task<string> GetCurrencies();
         List<CurrencyModel> ParseCurrenciesToModel(string json);
+        Task<double> GetCurrencyByKey(string key);
     }
 }

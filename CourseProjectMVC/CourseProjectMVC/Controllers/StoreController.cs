@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using _1stWebApp.utils.reflect;
 using CourseProjectMVC.Entities;
+using CourseProjectMVC.Interfaces;
 using CourseProjectMVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,24 +19,22 @@ namespace CourseProjectMVC.Controllers
     [Authorize(Roles = "Admin")]
     public class StoreController : ControllerBase
     {
-        private readonly MyDbContext _db;
+        private readonly IStoreService _storeService;
+        private readonly IStockService _stockService;
 
-        public StoreController(MyDbContext context)
+        public StoreController(IStoreService context, IStockService service)
         {
-            _db = context;
+            _storeService = context;
+            _stockService = service;
         }
-        // GET: api/Store
+        
         [HttpGet("get")]
         public async Task<IActionResult> Get()
         {
             
             try
             {
-               var stores = await _db.Stores.AsNoTracking()
-                   .Include(x=> x.Stock)
-                   .Include(y => y.Orders)
-                   .Include(z => z.Staff)
-                   .OrderBy(x => x.StoreId).ToArrayAsync();
+                var stores = await _storeService.GetAll();
                return Ok(stores);
             }
             catch (Exception e)
@@ -45,17 +44,12 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // GET: api/Store/5
         [HttpGet("get/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
             {
-                var store = await _db.Stores.AsNoTracking()
-                    .Include(x => x.Stock)
-                    .Include(y => y.Orders)
-                    .Include(z => z.Staff)
-                    .FirstAsync(x => x.StoreId == id);
+                var store = await _storeService.GetById(id);
                 if (store == null) return NotFound();
                 return Ok(store);
             }
@@ -66,22 +60,12 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // POST: api/Store
         [HttpPost("post")]
         public async Task<IActionResult> Post([FromBody] StoreModel model)
         {
             try
             {
-                var store = new Store();
-                Reflection.UpdateEntity(store,model);
-                await _db.AddAsync(store);
-                var stock = new Stock
-                {
-                    Store = store
-                };
-                stock.Products = new Dictionary<string, int>();
-                await _db.AddAsync(stock);
-                await _db.SaveChangesAsync();
+                var store = await _storeService.CreateStore(model);
                 return StatusCode(201, store);
             }
             catch (Exception e)
@@ -91,17 +75,14 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // PUT: api/Store/5
         [HttpPatch("patch/{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] StoreModel model)
         {
             try
             {
-                var store = await _db.Stores.FindAsync(id);
-                if (store == null) return BadRequest();
-                Reflection.UpdateEntity(store, model);
-                _db.Stores.Update(store);
-                await _db.SaveChangesAsync();
+                var store = await _storeService.PatchStore(id, model);
+                if (store == null)
+                    return BadRequest();
                 return Ok(store);
             }
             catch (Exception e)
@@ -111,18 +92,14 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var store = await _db.Stores.FindAsync(id);
-                if (store == null) return BadRequest();
-                var stock = await _db.Stock.FindAsync(id);
-                _db.Stores.Remove(store);
-                _db.Stock.Remove(stock);
-                await _db.SaveChangesAsync();
+                var res = await _storeService.DeleteStore(id);
+                if (!res)
+                    return BadRequest();
                 return Ok();
             }
             catch (Exception e)
@@ -137,20 +114,8 @@ namespace CourseProjectMVC.Controllers
         {
             try
             {
-                var product = await _db.Product.FindAsync(productId);
-                var stock = await _db.Stock.FindAsync(id);
-                if (stock == null || product == null) return BadRequest();
-                if (stock.Products.ContainsKey(product.Name))
-                {
-                    stock.Products[product.Name]++;
-                }
-                else
-                {
-                    stock.Products.Add(product.Name, productId);
-                }
-
-                _db.Stock.Update(stock);
-                await _db.SaveChangesAsync();
+                var res = await _stockService.PatchStock(id, productId);
+                if (res == null) return BadRequest();
                 return Ok();
             }
             catch (Exception e)

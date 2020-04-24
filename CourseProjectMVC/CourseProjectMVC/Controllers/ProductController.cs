@@ -16,40 +16,30 @@ namespace CourseProjectMVC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class ProductController : ControllerBase
     {
-        private readonly MyDbContext _db;
+        private readonly IProductService _productService;
         private readonly IСurrencyService _сurrencyService;
-        private readonly IRedisService _redisService;
-        public ProductController(MyDbContext context, IСurrencyService s, IRedisService r)
+        public ProductController(IProductService context, IСurrencyService s, IRedisService r)
         {
-            _db = context;
+            _productService = context;
             _сurrencyService = s;
-            _redisService = r;
         }
-        // GET: api/Store
+
         [HttpGet("get")]
         public async Task<IActionResult> Get(string CountryCode)
         {
             try
             {
-                double ratio = 1;
-                if (CountryCode != null)
-                {
-                   var str= await _redisService.Consume("Cur");
-                   var currenciesString = str.Value;
-                   var currenciesModel = _сurrencyService.ParseCurrenciesToModel(currenciesString);
-                   var nums = currenciesModel.Where(z=> z.cc == CountryCode).Select(x => x.rate);
-                   if (nums.Any()) ratio = nums.First();
-                }
-
-                var product = await _db.Product.OrderBy(x => x.ProductId).ToArrayAsync();
-                for (int i = 0; i < product.Length; i++)
-                {
-                    product[i].Price *= ratio;
-                }
-                return Ok(product);
+                double ratio = await _сurrencyService.GetCurrencyByKey(CountryCode);
+                var products = await _productService.GetAll();
+                var productsRatioed = products.Select(x =>
+               {
+                   x.Price /= ratio;
+                   return x;
+               });
+                return Ok(productsRatioed);
             }
             catch (Exception e)
             {
@@ -58,14 +48,15 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // GET: api/Store/5
         [HttpGet("get/{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(int id, string CountryCode)
         {
             try
             {
-                var product = await _db.Product.FindAsync(id);
+                double ratio = await _сurrencyService.GetCurrencyByKey(CountryCode);
+                var product = await _productService.GetById(id);
                 if (product == null) return NotFound();
+                product.Price /= ratio;
                 return Ok(product);
             }
             catch (Exception e)
@@ -75,16 +66,12 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // POST: api/Store
         [HttpPost("post")]
         public async Task<IActionResult> Post([FromBody] ProductModel model)
         {
             try
             {
-                var product = new Product();
-                Reflection.UpdateEntity(product, model);
-                await _db.AddAsync(product);
-                await _db.SaveChangesAsync();
+                var product = await _productService.CreateProduct(model);
                 return StatusCode(201, product);
             }
             catch (Exception e)
@@ -94,17 +81,13 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // PUT: api/Store/5
         [HttpPatch("patch/{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] ProductModel model)
         {
             try
             {
-                var product = await _db.Product.FindAsync(id);
+                var product = await _productService.PatchProduct(id, model);
                 if (product == null) return BadRequest();
-                Reflection.UpdateEntity(product, model);
-                _db.Product.Update(product);
-                await _db.SaveChangesAsync();
                 return Ok(product);
             }
             catch (Exception e)
@@ -114,16 +97,13 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var product = await _db.Product.FindAsync(id);
-                if (product == null) return BadRequest();
-                _db.Product.Remove(product);
-                await _db.SaveChangesAsync();
+                var res = await _productService.DeleteProduct(id);
+                if (!res) return BadRequest();
                 return Ok();
             }
             catch (Exception e)

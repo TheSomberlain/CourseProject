@@ -7,5 +7,6 @@ namespace CourseProjectMVC.Models
 {
     public class OrderModel
     {
+        public string CustomerId { get; set; }
     }
 }

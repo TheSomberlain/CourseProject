@@ -30,7 +30,6 @@ namespace CourseProjectMVC
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<MyDbContext>(options =>
@@ -86,10 +85,15 @@ namespace CourseProjectMVC
 
             services.AddScoped<IRedisService,RedisService>();
             services.AddScoped<IÑurrencyService, CurrencyService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IStaffService, StaffService>();
+            services.AddScoped<IStoreService, StoreService>();
+            services.AddScoped<IStockService, StockServices>();
 
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using _1stWebApp.utils.reflect;
 using CourseProjectMVC.Entities;
+using CourseProjectMVC.Interfaces;
 using CourseProjectMVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,26 +18,20 @@ namespace CourseProjectMVC.Controllers
     [Authorize(Roles = "Admin")]
     public class OrderController : ControllerBase
     {
-        private readonly MyDbContext _db;
+        private readonly IOrderService _orderService;
 
-        public OrderController(MyDbContext context)
+        public OrderController(IOrderService context)
         {
-            _db = context;
+            _orderService = context;
         }
-        // GET: api/Store
+
         [HttpGet("get")]
         public async Task<IActionResult> Get()
         {
             try
             {
-                var Order = await _db.Orders.AsNoTracking()
-                    .Include(x => x.Customer)
-                    .Select(x => new
-                        {x.OrderId, x.OrderDate, x.OrderStatus, x.RequiredDate, x.ShippedDate, x.Store,
-                            Customer = new {x.Customer.FistName,x.Customer.LastName}})
-                    .ToArrayAsync();
-                
-                return Ok(Order);
+                var order = await _orderService.GetAll();
+                return Ok(order);
             }
             catch (Exception e)
             {
@@ -45,22 +40,14 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // GET: api/Store/5
         [HttpGet("get/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
             {
-                var Order = await _db.Orders.AsNoTracking()
-                    .Include(x => x.Customer)
-                    .Select(x => new
-                    {
-                        x.OrderId, x.OrderDate, x.OrderStatus, x.RequiredDate, x.ShippedDate, x.Store,
-                        Customer = new {x.Customer.FistName, x.Customer.LastName}
-                    })
-                    .FirstAsync(z => z.OrderId == id);
-                if (Order == null) return NotFound();
-                return Ok(Order);
+                var order = await _orderService.GetById(id);
+                if (order == null) return NotFound();
+                return Ok(order);
             }
             catch (Exception e)
             {
@@ -69,20 +56,13 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // POST: api/Store
         [HttpPost("post")]
         public async Task<IActionResult> Post()
         {
             try
             {
-                var Order = new Order
-                {
-                    OrderStatus = OrderStatus.Rendering,
-                    OrderDate = DateTime.Now
-                };
-                await _db.AddAsync(Order);
-                await _db.SaveChangesAsync();
-                return StatusCode(201, Order);
+                var order = await _orderService.CreateOrder();
+                return StatusCode(201, order);
             }
             catch (Exception e)
             {
@@ -91,18 +71,15 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // PUT: api/Store/5
         [HttpPatch("patch/{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] OrderModel model)
         {
             try
             {
-                var Order = await _db.Orders.FindAsync(id);
-                if (Order == null) return BadRequest();
-                Reflection.UpdateEntity(Order, model);
-                _db.Orders.Update(Order);
-                await _db.SaveChangesAsync();
-                return Ok(Order);
+                var order = await _orderService.PatchOrder(id, model);
+                if(order != null)
+                    return Ok(order);
+                return BadRequest();
             }
             catch (Exception e)
             {
@@ -111,17 +88,14 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var Order = await _db.Orders.FindAsync(id);
-                if (Order == null) return BadRequest();
-                _db.Orders.Remove(Order);
-                await _db.SaveChangesAsync();
-                return Ok();
+                var res = await _orderService.DeleteOrder(id);
+                if (res) return Ok();
+                return BadRequest();
             }
             catch (Exception e)
             {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using _1stWebApp.utils.reflect;
 using CourseProjectMVC.Entities;
+using CourseProjectMVC.Interfaces;
 using CourseProjectMVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,19 +18,19 @@ namespace CourseProjectMVC.Controllers
     [Authorize(Roles = "Admin")]
     public class StockController : ControllerBase
     {
-        private readonly MyDbContext _db;
+        private readonly IStockService _stockService;
 
-        public StockController(MyDbContext context)
+        public StockController(IStockService context)
         {
-            _db = context;
+            _stockService = context;
         }
-        // GET: api/Store
+
         [HttpGet("get")]
         public async Task<IActionResult> Get()
         {
             try
             {
-                var stocks = await _db.Stock.AsNoTracking().OrderBy(x => x.StockId).ToArrayAsync();
+                var stocks = await _stockService.GetAll();
                 return Ok(stocks);
             }
             catch (Exception e)
@@ -39,15 +40,15 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
-        // GET: api/Store/5
         [HttpGet("get/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
             {
-                var store = await _db.Stock.FindAsync(id);
-                if (store == null) return NotFound();
-                return Ok(store);
+                var stock = await _stockService.GetById(id);
+                if (stock == null) 
+                    return NotFound();
+                return Ok(stock);
             }
             catch (Exception e)
             {

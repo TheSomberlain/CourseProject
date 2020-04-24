@@ -11,6 +11,11 @@ namespace CourseProjectMVC.Services
 {
     public class CurrencyService : IСurrencyService
     {
+        private readonly IRedisService _redisService;
+        public CurrencyService(IRedisService s)
+        {
+            _redisService = s;
+        }
         public async Task<string> GetCurrencies()
         {
             using (var client = new HttpClient())
@@ -24,6 +29,17 @@ namespace CourseProjectMVC.Services
             }
 
             return null;
+        }
+
+        public async Task<double> GetCurrencyByKey(string key)
+        {
+            if (key == null)
+                return 1;
+            var str = await _redisService.Consume("currency");
+            var currenciesString = str.Value;
+            var currenciesModel = ParseCurrenciesToModel(currenciesString);
+            var nums = currenciesModel.Where(z => z.cc == key).Select(x => x.rate);
+            return nums.Any() ? nums.First() : 1;
         }
 
         public List<CurrencyModel> ParseCurrenciesToModel(string json)

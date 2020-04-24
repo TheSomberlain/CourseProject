@@ -11,23 +11,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using  Newtonsoft.Json;
 using System.Web;
+using CourseProjectMVC.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 
-namespace _1stWebApp.Controllers
+namespace CourseProjectMVC.Controllers
 {
     
     [ApiController]
     [Route("api/user")]
-    public class CustomerAuthController : ControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly MyDbContext _db;
-        public CustomerAuthController(UserManager<User> um, SignInManager<User> signInManager, MyDbContext context)
+        private readonly IAuthService _authService;
+        public AuthController(IAuthService service)
         {
-            _userManager = um;
-            _signInManager = signInManager;
-            _db = context;
+            _authService = service;
         }
 
         [HttpPost("register")]
@@ -35,34 +32,30 @@ namespace _1stWebApp.Controllers
             [FromForm] string lastName,
             [FromForm] string password)
         {
-            var user = new User() { UserName = name, LastName = lastName };
-            var result = await _userManager.CreateAsync(user, password);
-            if (result.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, "Regular");
-                return Ok();
-            }
+            var result = await _authService.Register(name, lastName, password);   
+            if (result.Succeeded) return Ok();
             return StatusCode(409);
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromForm] string name, [FromForm] string password)
         {
-            var user = await _userManager.FindByNameAsync(name);
-            if (user != null)
+            try
             {
-                var res = await _signInManager.PasswordSignInAsync(user, password, false, false);
-                if (res.Succeeded)
-                {
-                    return Ok();
-                }
+                var res = await _authService.Login(name, password);
+                if (res.Succeeded) return Ok();
+                return StatusCode(405);
             }
-            return StatusCode(409);
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(409);
+            }
         }
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await _authService.Logout();
             return Ok();
         }
     }

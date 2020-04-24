@@ -50,7 +50,7 @@ namespace CourseProjectMVC.Controllers
             try
             {
                 var currencies = await _currencyService.GetCurrencies();
-                await _redisService.Put("Сurrency", currencies);
+                await _redisService.Put("currency", currencies);
                 return Ok();
             }
             catch (Exception e)

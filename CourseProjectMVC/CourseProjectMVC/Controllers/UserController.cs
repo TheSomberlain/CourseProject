@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using _1stWebApp.utils.reflect;
+using CourseProjectMVC.Interfaces;
 using CourseProjectMVC.Models;
 using NHibernate.Linq;
 
@@ -20,16 +21,18 @@ namespace CourseProjectMVC.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly MyDbContext _db;
-        public CustomerServiceController(UserManager<User> um, SignInManager<User> signInManager, MyDbContext context)
+        private readonly IOrderService _orderService;
+        public CustomerServiceController(UserManager<User> um, SignInManager<User> signInManager, MyDbContext context, IOrderService service)
         {
             _userManager = um;
             _signInManager = signInManager;
             _db = context;
+            _orderService = service;
         }
 
         [HttpGet("get")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetCustomers()
+        public async Task<IActionResult> GetUsers()
         {
             var customers = await _db.User.AsNoTracking()
                 .OrderBy(x => x.Id).ToArrayAsync();
