@@ -39,6 +39,13 @@ namespace CourseProjectMVC.Services
             var stock = await _db.Stock.FindAsync(store.StockId);
             _db.Stores.Remove(store);
             _db.Stock.Remove(stock);
+            var staff1 =  await _db.Staff.Where(x => x.StoreId == id).ToArrayAsync();
+            var staff = staff1.Select(x =>
+            {
+                x.StoreId = null;
+                return x;
+            });
+            _db.Staff.UpdateRange(staff);    
             await _db.SaveChangesAsync();
             return true;
         }
@@ -71,6 +78,12 @@ namespace CourseProjectMVC.Services
             _db.Stores.Update(store);
             await _db.SaveChangesAsync();
             return store;
+        }
+
+        public async Task<bool> Contains(int id)
+        {
+            var res = await _db.Stores.Where(x => x.StoreId == id).FirstOrDefaultAsync();
+            return res != null;
         }
     }
 }

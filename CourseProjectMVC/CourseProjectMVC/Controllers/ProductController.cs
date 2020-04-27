@@ -16,7 +16,7 @@ namespace CourseProjectMVC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -66,6 +66,7 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("post")]
         public async Task<IActionResult> Post([FromBody] ProductModel model)
         {
@@ -81,6 +82,7 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("patch/{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] ProductModel model)
         {
@@ -97,6 +99,7 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {

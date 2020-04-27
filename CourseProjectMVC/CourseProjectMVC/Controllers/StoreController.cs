@@ -16,16 +16,18 @@ namespace CourseProjectMVC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class StoreController : ControllerBase
     {
         private readonly IStoreService _storeService;
         private readonly IStockService _stockService;
+        private readonly IStaffService _staffService;
 
-        public StoreController(IStoreService context, IStockService service)
+        public StoreController(IStoreService context, IStockService service, IStaffService s)
         {
             _storeService = context;
             _stockService = service;
+            _staffService = s;
         }
         
         [HttpGet("get")]
@@ -60,6 +62,7 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("post")]
         public async Task<IActionResult> Post([FromBody] StoreModel model)
         {
@@ -75,6 +78,7 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("patch/{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] StoreModel model)
         {
@@ -92,6 +96,7 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -109,18 +114,44 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("addProduct/{id}")]
         public async Task<IActionResult> AddProduct(int id, [FromForm] int productId )
         {
             try
             {
-                var res = await _stockService.PatchStock(id, productId);
+                var store = await _storeService.GetById(id);
+                if (store == null) return BadRequest();
+                var res = await _stockService.PatchStock(store.StockId, productId);
                 if (res == null) return BadRequest();
                 return Ok();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                return StatusCode(409);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("addStaff/{id}")]
+        public async Task<IActionResult> AddStaff(int id, [FromForm] int staffId)
+        {
+            try
+            {
+                bool res1 = await _storeService.Contains(id);
+                if (!res1) return BadRequest();
+                var model = new StaffModel()
+                {
+                    StoreId = id
+                };
+                var res = await _staffService.PatchStaff(staffId,model);
+                if (res == null) return BadRequest();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
                 return StatusCode(409);
             }
         }

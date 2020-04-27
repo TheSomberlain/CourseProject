@@ -42,7 +42,8 @@ namespace CourseProjectMVC
             builder.Entity<Order>()
                 .HasOne<User>(ord => ord.Customer)
                 .WithMany(cust => cust.Orders)
-                .HasForeignKey(k => k.CustomerId);
+                .HasForeignKey(k => k.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Order>()
                 .HasOne<Store>(ord => ord.Store)

@@ -45,6 +45,7 @@ namespace CourseProjectMVC.Services
 
             var order = await _db.Orders.AsNoTracking()
                 .Include(x => x.Customer)
+                .Include(y => y.OrderProducts)
                 .Select(x => new
                 {
                     x.OrderId,
@@ -53,7 +54,8 @@ namespace CourseProjectMVC.Services
                     x.RequiredDate,
                     x.ShippedDate,
                     x.Store,
-                    Customer = new { x.Customer.FistName, x.Customer.LastName }
+                    Customer = new { x.Customer.FistName, x.Customer.LastName },
+                    Products = x.OrderProducts.Select(z => z.Product)
                 })
                 .ToArrayAsync();
             return order;
@@ -63,6 +65,7 @@ namespace CourseProjectMVC.Services
         {
             var order = await _db.Orders.AsNoTracking()
                 .Include(x => x.Customer)
+                .Include(y=>y.OrderProducts)
                 .Select(x => new
                 {
                     x.OrderId,
@@ -71,7 +74,8 @@ namespace CourseProjectMVC.Services
                     x.RequiredDate,
                     x.ShippedDate,
                     x.Store,
-                    Customer = new { x.Customer.FistName, x.Customer.LastName }
+                    Customer = new { x.Customer.FistName, x.Customer.LastName },
+                    Products = x.OrderProducts.Select(z=>z.Product)
                 })
                 .FirstOrDefaultAsync(z => z.OrderId == id);
             return order;

@@ -15,14 +15,16 @@ namespace CourseProjectMVC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly IAuthService _authService;
 
-        public OrderController(IOrderService context)
+        public OrderController(IOrderService context, IAuthService a)
         {
             _orderService = context;
+            _authService = a;
         }
 
         [HttpGet("get")]
@@ -56,6 +58,7 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("post")]
         public async Task<IActionResult> Post()
         {
@@ -71,6 +74,7 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("patch/{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] OrderModel model)
         {
@@ -88,6 +92,7 @@ namespace CourseProjectMVC.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {

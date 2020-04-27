@@ -14,5 +14,6 @@ namespace CourseProjectMVC.Interfaces
         Task<Store> CreateStore(StoreModel model);
         Task<Store> PatchStore(int id, StoreModel model);
         Task<bool> DeleteStore(int id);
+        Task<bool> Contains(int id);
     }
 }

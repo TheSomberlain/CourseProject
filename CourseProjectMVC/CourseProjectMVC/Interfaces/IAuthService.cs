@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CourseProjectMVC.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace CourseProjectMVC.Interfaces
@@ -11,5 +12,7 @@ namespace CourseProjectMVC.Interfaces
         Task<IdentityResult> Register(string name, string lastname, string password);
         Task<SignInResult> Login(string name, string password);
         Task Logout();
+
+        Task<User> GetCurrentUser(string name);
     }
 }

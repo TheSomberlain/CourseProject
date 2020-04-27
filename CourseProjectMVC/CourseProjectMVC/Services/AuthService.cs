@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using CourseProjectMVC.Entities;
 using CourseProjectMVC.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace CourseProjectMVC.Services
 {
@@ -12,11 +14,21 @@ namespace CourseProjectMVC.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly MyDbContext _db;
+        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, MyDbContext db)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _db = db;
         }
+
+        public async Task<User> GetCurrentUser(string name)
+        {
+            var user = await _db.User.Where(x => x.UserName == name).ToArrayAsync();
+            var curUser = user[0];
+            return curUser;
+        }
+
         public async Task<SignInResult> Login(string name, string password)
         {
             var user = await _userManager.FindByNameAsync(name);

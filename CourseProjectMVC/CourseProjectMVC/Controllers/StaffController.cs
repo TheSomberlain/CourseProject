@@ -15,7 +15,7 @@ namespace CourseProjectMVC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class StaffController : ControllerBase
     {
         private readonly IStaffService _staffService;
@@ -24,7 +24,7 @@ namespace CourseProjectMVC.Controllers
         {
             _staffService = context;
         }
-        // GET: api/Store
+
         [HttpGet("get")]
         public async Task<IActionResult> Get()
         {
@@ -57,6 +57,7 @@ namespace CourseProjectMVC.Controllers
         }
 
         [HttpPost("post")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromBody] StaffModel model)
         {
             try
@@ -72,6 +73,7 @@ namespace CourseProjectMVC.Controllers
         }
 
         [HttpPatch("patch/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Put(int id, [FromBody] StaffModel model)
         {
             try
@@ -89,6 +91,7 @@ namespace CourseProjectMVC.Controllers
         }
 
         [HttpDelete("delete/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             try

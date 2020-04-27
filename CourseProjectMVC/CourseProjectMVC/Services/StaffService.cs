@@ -38,7 +38,7 @@ namespace CourseProjectMVC.Services
 
         public async Task<IEnumerable<Staff>> GetAll()
         {
-            var staff = await _db.Staff.AsNoTracking().OrderBy(x => x.StaffId).ToArrayAsync();
+            var staff = await _db.Staff.AsNoTracking().Include(x=>x.Store).OrderBy(x => x.StaffId).ToArrayAsync();
             return staff;
         }
 
